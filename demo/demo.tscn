@@ -1,0 +1,290 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://demo/demo.gd" type="Script" id=1]
+
+[sub_resource type="StyleBoxFlat" id=2]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+bg_color = Color( 0.184314, 0.227451, 0.321569, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id=3]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+bg_color = Color( 0.227451, 0.278431, 0.4, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id=4]
+draw_center = false
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color( 0.15, 0.69, 0.75, 0.7 )
+shadow_size = 2
+
+[sub_resource type="StyleBoxFlat" id=5]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+bg_color = Color( 0.154104, 0.190175, 0.269531, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id=1]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+bg_color = Color( 0.152941, 0.188235, 0.270588, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id=8]
+bg_color = Color( 0.309804, 0.372549, 0.517647, 1 )
+
+[sub_resource type="StyleBoxFlat" id=7]
+bg_color = Color( 0.309804, 0.372549, 0.517647, 1 )
+
+[sub_resource type="StyleBoxFlat" id=6]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+bg_color = Color( 0.152941, 0.188235, 0.270588, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.309804, 0.372549, 0.517647, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id=9]
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 5.0
+content_margin_bottom = 5.0
+bg_color = Color( 0.121569, 0.152941, 0.219608, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.309804, 0.372549, 0.517647, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+open_folder_dialog_path = NodePath("FileDialog")
+hint_lbl_path = NodePath("MarginContainer/VBoxContainer/HintLbl")
+current_folder_lbl_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer2/CurrentFolderLbl")
+open_folder_btn_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer2/OpenFolderBtn")
+folders_lbl_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/FoldersLbl")
+files_lbl_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer/FilesLbl")
+folders_itemlist_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/FoldersItemlist")
+files_itemlist_path = NodePath("MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/FilesItemlist")
+output_log_path = NodePath("MarginContainer/VBoxContainer/VBoxContainer/OutputLog")
+clear_output_log_btn_path = NodePath("MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer/ClearOutputBtn")
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.0862745, 0.105882, 0.14902, 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 1004.0
+margin_bottom = 580.0
+rect_min_size = Vector2( 600, 0 )
+custom_constants/separation = 10
+
+[node name="HintLbl" type="Label" parent="MarginContainer/VBoxContainer"]
+visible = false
+margin_right = 984.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+text = "Hint: modify, create, and delete files and folders inside of [%hint%] and watch for changes below :)"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 984.0
+margin_bottom = 30.0
+
+[node name="CurrentFolderLbl" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+margin_top = 8.0
+margin_right = 881.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+text = "Open a folder to begin monitoring..."
+
+[node name="OpenFolderBtn" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 885.0
+margin_right = 984.0
+margin_bottom = 30.0
+custom_styles/hover = SubResource( 2 )
+custom_styles/pressed = SubResource( 3 )
+custom_styles/focus = SubResource( 4 )
+custom_styles/disabled = SubResource( 5 )
+custom_styles/normal = SubResource( 1 )
+text = "Open Folder"
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 984.0
+margin_bottom = 41.0
+rect_min_size = Vector2( 0, 1 )
+color = Color( 0.309804, 0.372549, 0.517647, 1 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_top = 51.0
+margin_right = 984.0
+margin_bottom = 300.0
+size_flags_vertical = 3
+custom_constants/separation = 20
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_right = 482.0
+margin_bottom = 249.0
+size_flags_horizontal = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 482.0
+margin_bottom = 14.0
+
+[node name="FoldersLbl" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_right = 482.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+text = "Folders:"
+
+[node name="FoldersItemlist" type="ItemList" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 482.0
+margin_bottom = 249.0
+size_flags_vertical = 3
+custom_constants/vseparation = 5
+custom_constants/hseparation = 10
+custom_styles/selected_focus = SubResource( 8 )
+custom_styles/selected = SubResource( 7 )
+custom_styles/bg = SubResource( 6 )
+select_mode = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 502.0
+margin_right = 984.0
+margin_bottom = 249.0
+size_flags_horizontal = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_right = 482.0
+margin_bottom = 14.0
+
+[node name="FilesLbl" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+margin_right = 482.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+text = "Files:"
+
+[node name="FilesItemlist" type="ItemList" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 24.0
+margin_right = 482.0
+margin_bottom = 249.0
+size_flags_vertical = 3
+custom_constants/vseparation = 5
+custom_constants/hseparation = 10
+custom_styles/selected_focus = SubResource( 8 )
+custom_styles/selected = SubResource( 7 )
+custom_styles/bg = SubResource( 6 )
+select_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_top = 310.0
+margin_right = 984.0
+margin_bottom = 560.0
+size_flags_vertical = 3
+custom_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/VBoxContainer"]
+margin_right = 984.0
+margin_bottom = 30.0
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_top = 8.0
+margin_right = 853.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+text = "Output Log:"
+
+[node name="ClearOutputBtn" type="Button" parent="MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 857.0
+margin_right = 984.0
+margin_bottom = 30.0
+custom_styles/hover = SubResource( 2 )
+custom_styles/pressed = SubResource( 3 )
+custom_styles/focus = SubResource( 4 )
+custom_styles/disabled = SubResource( 5 )
+custom_styles/normal = SubResource( 1 )
+text = "Clear Output Log"
+
+[node name="OutputLog" type="TextEdit" parent="MarginContainer/VBoxContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 984.0
+margin_bottom = 250.0
+size_flags_vertical = 3
+custom_styles/read_only = SubResource( 9 )
+readonly = true
+show_line_numbers = true
+smooth_scrolling = true
+wrap_enabled = true
+
+[node name="FileDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -275.5
+margin_top = -143.5
+margin_right = 275.5
+margin_bottom = 143.5
+rect_min_size = Vector2( 400, 140 )
+popup_exclusive = true
+window_title = "Open a Folder"
+resizable = true
+mode_overrides_title = false
+mode = 2
+access = 2
+current_dir = "/Users/slooth/Documents/godot projects/fsmonitor"
+current_path = "/Users/slooth/Documents/godot projects/fsmonitor/"

@@ -1,0 +1,35 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Node",
+"class": "FSMonitor",
+"language": "GDScript",
+"path": "res://src/fsmonitor.gd"
+} ]
+_global_script_class_icons={
+"FSMonitor": ""
+}
+
+[application]
+
+config/name="fsmonitor"
+run/main_scene="res://demo/demo.tscn"
+config/icon="res://icon.png"
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+vram_compression/import_etc=true
+vram_compression/import_etc2=false
