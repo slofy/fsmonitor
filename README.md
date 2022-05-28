@@ -26,6 +26,11 @@ func _ready():
 	fsm.connect("file_deleted", self, "_on_fsm_file_deleted")
 	fsm.connect("directory_created", self, "_on_fsm_directory_created")
 	fsm.connect("directory_deleted", self, "_on_fsm_directory_deleted")
+	
+	fsm.watch("path/to/directory")
+	
+	# You may also specify the index delay
+	# fsm.watch("path/to/directory", 10)
 ```
 
 See [`demo/`](/demo) for a detailed example.
