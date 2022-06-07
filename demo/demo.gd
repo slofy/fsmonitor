@@ -1,3 +1,4 @@
+# NOTE: There's a bit of repeat code in the ui when it comes to the fsm events, triggering a large amount of un-necessary redraws. There's a bit of room for optimization performance-wise when dealing with large directories (50,000+ items), but for the sake of the demo, said optimization has not been done (yet).
 extends Control
 
 
@@ -31,9 +32,14 @@ var folders := []
 var files := []
 
 
+var current_directory: String = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+
+
 func _ready():
 	fsm = FSMonitor.new()
 	add_child(fsm)
+	
+	open_folder_dialog.current_dir = current_directory
 	
 	fsm.connect("file_created", self, "_on_fsm_file_created")
 	fsm.connect("file_modified", self, "_on_fsm_file_modified")
@@ -72,10 +78,20 @@ func update_itemlists() -> void:
 	files_itemlist.clear()
 	
 	for folder_obj in folders:
+		if folders_itemlist.get_item_count() >= 200:
+			break
+		
 		folders_itemlist.add_item(folder_obj["absolute_path"])
 	
 	for file_obj in files:
+		if files_itemlist.get_item_count() >= 200:
+			break
+		
 		files_itemlist.add_item(file_obj["absolute_path"])
+	
+	folders_lbl.text = "Folders: Showing %s of %s" % [folders_itemlist.get_item_count(), folders.size()]
+	
+	files_lbl.text = "Files: Showing %s of %s" % [files_itemlist.get_item_count(), files.size()]
 
 
 func _on_fsm_file_created(file_obj: Dictionary) -> void:
@@ -117,6 +133,9 @@ func _remove_resource(path: String, source: Array) -> void:
 
 
 func _append_output_log(message: String) -> void:
-	output_log.text += message
-	output_log.text += "\n"
+	var lc = output_log.get_line_count()
+	if lc > 50:
+		output_log.set_text("")
+	
+	output_log.set_text("%s\n%s" % [output_log.text, message])
 	output_log.cursor_set_line(output_log.get_line_count())

@@ -266,8 +266,9 @@ margin_bottom = 250.0
 size_flags_vertical = 3
 custom_styles/read_only = SubResource( 9 )
 readonly = true
-show_line_numbers = true
-smooth_scrolling = true
+context_menu_enabled = false
+shortcut_keys_enabled = false
+virtual_keyboard_enabled = false
 wrap_enabled = true
 
 [node name="FileDialog" type="FileDialog" parent="."]

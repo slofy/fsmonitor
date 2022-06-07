@@ -13,11 +13,19 @@ signal on_error(message)
 
 
 var _directory: String = ""
-var _indexed_files_cache := []
-var _indexed_dirs_cache := []
+var _indexed_files_cache: Array = []
+var _indexed_dirs_cache: Array = []
 
 var _timer: Timer
 var _delay: float = 5.0
+
+var _thread: Thread
+var _mutex: Mutex
+var _semaphore: Semaphore
+var _should_exit: bool = false
+var _thread_working: bool = false
+
+var _abort_recursive_index: bool = false
 
 
 func _ready() -> void:
@@ -25,18 +33,37 @@ func _ready() -> void:
 	_timer.connect("timeout", self, "_on_timer_timeout")
 	add_child(_timer)
 
+	_thread = Thread.new()
+	_mutex = Mutex.new()
+	_semaphore = Semaphore.new()
+
+	_thread.start(self, "_thread_func")
+
+
+func abort_recursive() -> void:
+	_abort_recursive_index = true
+
 
 func watch(path: String, delay: float = 5.0) -> void:
+	_mutex.lock()
+	var thread_working = _thread_working
+	_mutex.unlock()
+	if thread_working:
+		print("[WATCH] - thread is working, we must abort it first")
+		abort_recursive()
+	
+	_mutex.lock()
 	_directory = path
+	_mutex.unlock()
 	_delay = delay
 	_timer.wait_time = _delay
 	_timer.paused = true
 	
-	_indexed_files_cache.clear()
-	_indexed_dirs_cache.clear()
+#	_indexed_files_cache.clear()
+#	_indexed_dirs_cache.clear()
 	
-	_map_dir_contents(_directory)
-	
+	_semaphore.post()
+
 	_timer.paused = false
 	_timer.start(_delay)
 
@@ -45,19 +72,20 @@ func _on_timer_timeout() -> void:
 	if not _directory:
 		return
 		
-	_map_dir_contents(_directory)
+	# _map_dir_contents(_directory)
+
+	# Might need to lock here too?
+	if _thread_working:
+		print("TIMER::TIMEOUT thread is still working")
+		return
+	
+	_semaphore.post()
+	print("TIMER::TIMEOUT semaphore:post")
 
 
 func _map_dir_contents(dir: String) -> void:
-	# var total_time = 0
-	# var start_time = OS.get_ticks_msec()
-	# print("begin - %s" % str(start_time))
 	_validate_caches()
 	_index_dir_recursive(dir)
-	# var end_time = OS.get_ticks_msec()
-	# print("end - %s" % str(end_time))
-	# total_time = end_time - start_time
-	# print("total time in msec: %s" % str(total_time))
 
 
 func _validate_caches() -> void:
@@ -77,7 +105,7 @@ func _validate_caches() -> void:
 		
 		if modified_at != file_obj["modified_at"]:
 			file_obj["modified_at"] = modified_at
-			emit_signal("file_modified", file_obj.duplicate())
+			call_deferred("emit_signal", "file_modified", file_obj.duplicate())
 	
 	var d: Directory = Directory.new()
 	var dirs_to_delete = []
@@ -89,23 +117,33 @@ func _validate_caches() -> void:
 	
 	for file_obj in files_to_delete:
 		_indexed_files_cache.erase(file_obj)
-		emit_signal("file_deleted", file_obj.duplicate())
+		call_deferred("emit_signal", "file_deleted", file_obj.duplicate())
 
 	for dir_obj in dirs_to_delete:
 		_indexed_dirs_cache.erase(dir_obj)
-		emit_signal("directory_deleted", dir_obj.duplicate())
+		call_deferred("emit_signal", "directory_deleted", dir_obj.duplicate())
 
 
 func _index_dir_recursive(dir: String) -> void:
+	if _abort_recursive_index:
+		print("ABORTING RECURSIVE INDEX")
+		return
+	
 	var directory_stream: Directory = Directory.new()
 	if directory_stream.open(dir) != OK:
-		emit_signal("on_error", "Error opening directory [%s]" % dir)
+		call_deferred("emit_signal", "on_error", "Error opening directory [%s]" % dir)
 		return
 	
 	directory_stream.list_dir_begin(true)
 	
 	var next = directory_stream.get_next()
 	while next != "":
+		_mutex.lock()
+		var should_exit = _should_exit
+		_mutex.unlock()
+		if should_exit:
+			break
+
 		var file: File = File.new()
 		var new_path = dir.plus_file(next)
 		var tmp_obj = {
@@ -115,14 +153,18 @@ func _index_dir_recursive(dir: String) -> void:
 		}
 		if directory_stream.current_is_dir():
 			if not _resource_is_cached(new_path, _indexed_dirs_cache):
+				_mutex.lock()
 				_indexed_dirs_cache.append(tmp_obj)
-				emit_signal("directory_created", tmp_obj.duplicate())
+				_mutex.unlock()
+				call_deferred("emit_signal", "directory_created", tmp_obj.duplicate())
 			
 			_index_dir_recursive(new_path)
 		else:
 			if not _resource_is_cached(new_path, _indexed_files_cache):
+				_mutex.lock()
 				_indexed_files_cache.append(tmp_obj)
-				emit_signal("file_created", tmp_obj.duplicate())
+				_mutex.unlock()
+				call_deferred("emit_signal", "file_created", tmp_obj.duplicate())
 		
 		next = directory_stream.get_next()
 	
@@ -146,3 +188,47 @@ func get_cached_files() -> Array:
 
 func get_cached_dirs() -> Array:
 	return _indexed_dirs_cache.duplicate(true)
+
+
+func _thread_func() -> void:
+	while true:
+		_semaphore.wait()
+
+		print("POSTED")
+
+		_mutex.lock()
+		var should_exit = _should_exit
+		var dir = _directory
+		var thread_working = _thread_working
+		_mutex.unlock()
+
+		if should_exit:
+			break
+
+		# Maybe emit an error for invalid dir path?
+		if dir == "" || thread_working:
+			print("skipping thread func cuz thread still working")
+			return
+		
+		_mutex.lock()
+		_abort_recursive_index = false
+		_thread_working = true
+		_indexed_files_cache.clear()
+		_indexed_dirs_cache.clear()
+		_mutex.unlock()
+		
+		_map_dir_contents(dir)
+
+		_mutex.lock()
+		_thread_working = false
+		_mutex.unlock()
+
+
+func _exit_tree() -> void:
+	_mutex.lock()
+	_should_exit = true
+	_mutex.unlock()
+
+	_semaphore.post()
+
+	_thread.wait_to_finish()
