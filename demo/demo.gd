@@ -61,14 +61,17 @@ func _on_dir_selected(dir: String) -> void:
 	hint_lbl.text = HINT_LBL_TEMPLATE.replace("%hint%", dir)
 	hint_lbl.visible = true
 	
+	folders = []
+	files = []
+	
 	fsm.watch(dir)
 	output_log.text = ""
 	
 	# Normally you won't directly access the cached directories and files, as FSM provides no structure/hierarchy, just a one dimensional array. If you were building a Tree for example, you'd want to maintain your own structure and index the files initially on your own, then use fsm to check for changes.
 	
 	# I'd recommend doing it in a separate thread, as the initial index and cache build is roughly 100x slower than the scans that follow (30000ms vs 300ms, sampled on ~1300 files/folders total). This will be fixed soon with the addition of threading in fsmonitor.gd
-	folders = fsm.get_cached_dirs()
-	files = fsm.get_cached_files()
+	# folders = fsm.get_cached_dirs()
+	# files = fsm.get_cached_files()
 	
 	update_itemlists()
 
