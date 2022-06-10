@@ -44,7 +44,7 @@ func _ready() -> void:
 func abort_recursive() -> void:
 	_abort_recursive_index = true
 
-
+var c = 0
 func watch(path: String, delay: float = 5.0) -> void:
 	_mutex.lock()
 	var thread_working = _thread_working
@@ -53,6 +53,10 @@ func watch(path: String, delay: float = 5.0) -> void:
 		print("[WATCH] - thread is working, we must abort it first")
 		abort_recursive()
 	
+	if c > 0:
+		return
+	
+	c += 1
 	_mutex.lock()
 	_directory = path
 	_should_clear_cache = true
@@ -149,6 +153,9 @@ func _index_dir_recursive(dir: String) -> void:
 		if should_exit:
 			break
 		
+		_mutex.lock()
+		abort =_abort_recursive_index
+		_mutex.unlock()
 		if abort:
 			return
 
@@ -162,27 +169,44 @@ func _index_dir_recursive(dir: String) -> void:
 		if directory_stream.current_is_dir():
 			if should_exit:
 				break
+			
+			_mutex.lock()
+			abort =_abort_recursive_index
+			_mutex.unlock()
 			if abort:
 				return
 			if not _resource_is_cached(new_path, _indexed_dirs_cache):
 				_mutex.lock()
 				_indexed_dirs_cache.append(tmp_obj)
+				abort = _abort_recursive_index
 				_mutex.unlock()
-				call_deferred("notify_dir_add", tmp_obj.duplicate())
+#				call_deferred("notify_dir_add", tmp_obj.duplicate())
 #				call_deferred("emit_signal", "directory_created", tmp_obj.duplicate())
+				if abort:
+					return
+				emit_signal("directory_created", tmp_obj.duplicate())
 			
 			_index_dir_recursive(new_path)
 		else:
 			if should_exit:
 				break
+			_mutex.lock()
+			abort =_abort_recursive_index
+			_mutex.unlock()
 			if abort:
 				return
 			if not _resource_is_cached(new_path, _indexed_files_cache):
 				_mutex.lock()
 				_indexed_files_cache.append(tmp_obj)
 				_mutex.unlock()
-				call_deferred("notify_file_add", tmp_obj.duplicate())
+#				call_deferred("notify_file_add", tmp_obj.duplicate())
 #				call_deferred("emit_signal", "file_created", tmp_obj.duplicate())
+				_mutex.lock()
+				abort =_abort_recursive_index
+				_mutex.unlock()
+				if abort:
+					return
+				emit_signal("file_created", tmp_obj.duplicate())
 		
 		if should_exit:
 			print("seb")
@@ -255,25 +279,25 @@ func _thread_func() -> void:
 		print("after map in thread")
 
 
-func notify_dir_add(dir_obj) -> void:
-	_mutex.lock()
-	var abort = _abort_recursive_index
-	_mutex.unlock()
-	if abort:
-		printerr("ERR: ABORT, CAN'T FIRE SIGNAL")
-		return
-	
-	emit_signal("directory_created", dir_obj)
-
-
-func notify_file_add(file_obj) -> void:
-	_mutex.lock()
-	var abort = _abort_recursive_index
-	_mutex.unlock()
-	if abort:
-		printerr("ERR: ABORT, CAN'T FIRE SIGNAL")
-		return
-	emit_signal("file_created", file_obj)
+#func notify_dir_add(dir_obj) -> void:
+#	_mutex.lock()
+#	var abort = _abort_recursive_index
+#	_mutex.unlock()
+#	if abort:
+#		printerr("ERR: ABORT, CAN'T FIRE SIGNAL")
+#		return
+#
+#	emit_signal("directory_created", dir_obj)
+#
+#
+#func notify_file_add(file_obj) -> void:
+#	_mutex.lock()
+#	var abort = _abort_recursive_index
+#	_mutex.unlock()
+#	if abort:
+#		printerr("ERR: ABORT, CAN'T FIRE SIGNAL")
+#		return
+#	emit_signal("file_created", file_obj)
 
 
 func _exit_tree() -> void:

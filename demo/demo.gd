@@ -99,28 +99,42 @@ func update_itemlists() -> void:
 
 func _on_fsm_file_created(file_obj: Dictionary) -> void:
 	files.append(file_obj)
+	call_deferred("offcd", file_obj)
+
+
+func offcd(file_obj) -> void:
 	update_itemlists()
 	_append_output_log("File created: %s" % file_obj["absolute_path"])
 
 
 func _on_fsm_file_modified(file_obj: Dictionary) -> void:
-	_append_output_log("File modified: %s" % file_obj["absolute_path"])
+	call_deferred("_append_output_log", "File modified: %s" % file_obj["absolute_path"])
+#	_append_output_log("File modified: %s" % file_obj["absolute_path"])
 
 
 func _on_fsm_file_deleted(file_obj: Dictionary) -> void:
 	_remove_resource(file_obj["absolute_path"], files)
+	call_deferred("offdd", file_obj)
+
+func offdd(file_obj) -> void:
 	update_itemlists()
 	_append_output_log("File deleted: %s" % file_obj["absolute_path"])
 
 
 func _on_fsm_directory_created(dir_obj: Dictionary) -> void:
 	folders.append(dir_obj)
+	call_deferred("ofdcd", dir_obj)
+
+func ofdcd(dir_obj) -> void:
 	update_itemlists()
 	_append_output_log("Folder created: %s" % dir_obj["absolute_path"])
 
 
 func _on_fsm_directory_deleted(dir_obj: Dictionary) -> void:
 	_remove_resource(dir_obj["absolute_path"], folders)
+	call_deferred("ofddd", dir_obj)
+
+func ofddd(dir_obj) -> void:
 	update_itemlists()
 	_append_output_log("Folder deleted: %s" % dir_obj["absolute_path"])
 
